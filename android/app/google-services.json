@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "873113452698",
+    "project_id": "get-gains-38ceb",
+    "storage_bucket": "get-gains-38ceb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:873113452698:android:fbb2adfcc958747389df23",
+        "android_client_info": {
+          "package_name": "com.get_gains.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjyKPO7g-bpzDfd9Mud6WgzW79TLOjtmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
