@@ -38,6 +38,8 @@ dependencies:
   firebase_auth: ^5.3.4
   cloud_firestore: ^5.6.0
   firebase_storage: ^12.3.7
+  provider: ^6.1.2
+  google_sign_in: ^6.2.2
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +62,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+      - assets/logos/google_logo.png
+      - assets/logos/get_gains.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
