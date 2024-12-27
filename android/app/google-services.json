@@ -12,7 +12,20 @@
           "package_name": "com.get_gains.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "873113452698-b7ghn8eh6be1639suhu5e9h22p635fbo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.get_gains.app",
+            "certificate_hash": "e95a7f25761e969ad99b2059a94ae59852280986"
+          }
+        },
+        {
+          "client_id": "873113452698-irndjc9b97bk3j0l5svohg6dhg5r1u9m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDjyKPO7g-bpzDfd9Mud6WgzW79TLOjtmA"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "873113452698-irndjc9b97bk3j0l5svohg6dhg5r1u9m.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "873113452698-rrn0lcbvp137hsuaj4njrt35fcgjp734.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.getGainsOnline"
+              }
+            }
+          ]
         }
       }
     }
