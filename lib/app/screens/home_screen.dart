@@ -4,6 +4,7 @@ import '../../features/data/services/firestore_service.dart';
 import '../../features/data/models/user_model.dart';
 import '../constants/colors.dart';
 import '../../features/workout/screens/workout_screen.dart';
+import '../../features/exercises/screens/exercises_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -144,7 +145,7 @@ class HomeScreen extends StatelessWidget {
                               end: Alignment.bottomRight,
                               colors: [
                                 AppColors.secondaryColor.withOpacity(0.8),
-                                AppColors.secondaryDark.withOpacity(0.6),
+                                AppColors.secondaryDark.withOpacity(1),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(16),
@@ -221,14 +222,14 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Container(
-                              height: 120,
+                              height: 128,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                   colors: [
                                     AppColors.primaryColor.withOpacity(0.8),
-                                    AppColors.primaryDark.withOpacity(0.6),
+                                    AppColors.primaryLight.withOpacity(1),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(12),
@@ -251,14 +252,14 @@ class HomeScreen extends StatelessWidget {
                           const SizedBox(width: 16),
                           Expanded(
                             child: Container(
-                              height: 120,
+                              height: 128,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                   colors: [
                                     AppColors.secondaryColor.withOpacity(0.8),
-                                    AppColors.secondaryDark.withOpacity(0.6),
+                                    AppColors.secondaryDark.withOpacity(1),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(12),
@@ -273,6 +274,70 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 128,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    AppColors.secondaryColor.withOpacity(0.8),
+                                    AppColors.secondaryDark.withOpacity(1),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: _QuickActionCard(
+                                icon: Icons.sports_gymnastics,
+                                title: 'Exercises',
+                                color: Colors.white,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ExercisesScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Container(
+                              height: 128,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    AppColors.primaryColor.withOpacity(0.8),
+                                    AppColors.primaryDark.withOpacity(1),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: _QuickActionCard(
+                                icon: Icons.book,
+                                title: 'Browse Workouts',
+                                color: Colors.white,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ExercisesScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ), // Empty space for symmetry
                         ],
                       ),
                     ],
