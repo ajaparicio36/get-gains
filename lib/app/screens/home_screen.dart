@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get_gains_online/features/auth/widgets/username_setup_dialog.dart';
 import '../../features/data/services/firestore_service.dart';
 import '../../features/data/models/user_model.dart';
 import '../constants/colors.dart';
+import '../../features/workout/screens/workout_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  Future<bool> _checkUserSetup(UserModel? user) async {
-    if (user == null || user.username == null) {
-      return false;
-    }
-    return true;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +238,12 @@ class HomeScreen extends StatelessWidget {
                                 title: 'Start a Workout',
                                 color: Colors.white,
                                 onTap: () {
-                                  // Navigate to workout screen
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => WorkoutsScreen(),
+                                    ),
+                                  );
                                 },
                               ),
                             ),
