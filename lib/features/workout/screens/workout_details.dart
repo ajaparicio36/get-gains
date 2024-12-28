@@ -60,10 +60,10 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final workoutData = snapshot.data?.data() as Map<String, dynamic>?;
-          if (workoutData == null) {
+          if (!snapshot.hasData || snapshot.data?.data() == null) {
             return const Center(child: Text('Workout not found'));
           }
+          final workoutData = snapshot.data!.data() as Map<String, dynamic>;
 
           final workout = WorkoutModel.fromMap(workoutData);
 
@@ -113,6 +113,10 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddExerciseScreen(context),
+        child: const Icon(Icons.add),
       ),
     );
   }
