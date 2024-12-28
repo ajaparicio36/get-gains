@@ -1,4 +1,3 @@
-// lib/app/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_gains_online/features/auth/widgets/username_setup_dialog.dart';
@@ -22,16 +21,107 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        centerTitle: true,
         title: const Text(
           'Get Gains',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => FirebaseAuth.instance.signOut(),
-          ),
-        ],
+      ),
+      drawer: StreamBuilder<UserModel?>(
+        stream: firestoreService.getUserStream(),
+        builder: (context, snapshot) {
+          final user = snapshot.data;
+          return Drawer(
+            child: Column(
+              children: [
+                UserAccountsDrawerHeader(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.secondaryColor,
+                        AppColors.secondaryDark,
+                      ],
+                    ),
+                  ),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundColor: AppColors.primaryLight,
+                    child: Text(
+                      (user?.username ?? user?.displayName ?? 'U')[0]
+                          .toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  accountName: Text(user?.displayName ?? 'User'),
+                  accountEmail: Text('@${user?.username ?? ''}'),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.fitness_center),
+                              title: const Text('Workouts'),
+                              onTap: () {
+                                // Navigate to workouts
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.sports_gymnastics),
+                              title: const Text('Exercises'),
+                              onTap: () {
+                                // Navigate to exercises
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.share),
+                              title: const Text('Share'),
+                              onTap: () {
+                                // Handle share
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        leading: const Icon(Icons.bug_report),
+                        title: const Text('Report Issue'),
+                        onTap: () {
+                          // Handle report
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.logout),
+                        title: const Text('Sign Out'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          FirebaseAuth.instance.signOut();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
       body: StreamBuilder<UserModel?>(
         stream: firestoreService.getUserStream(),
@@ -58,8 +148,6 @@ class HomeScreen extends StatelessWidget {
               }
 
               final user = snapshot.data;
-
-              // Rest of your existing UI code here...
               return CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
@@ -70,110 +158,142 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           // Welcome Section with Username
                           Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Welcome back,',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium
-                                                  ?.copyWith(
-                                                    color: Colors.grey,
-                                                  ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              '@${user?.username ?? user?.displayName ?? 'User'}',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headlineSmall
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      CircleAvatar(
-                                        backgroundColor: AppColors.primaryColor,
-                                        child: Text(
-                                          (user?.username ??
-                                                  user?.displayName ??
-                                                  'U')[0]
-                                              .toUpperCase(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    AppColors.secondaryColor.withOpacity(0.8),
+                                    AppColors.secondaryDark.withOpacity(0.6),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Welcome back,',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium
+                                                    ?.copyWith(
+                                                      color: Colors.white70,
+                                                    ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '@${user?.username ?? user?.displayName ?? 'User'}',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headlineSmall
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  const Text(
-                                    'Ready to crush your fitness goals today?',
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ],
+                                        CircleAvatar(
+                                          backgroundColor:
+                                              Colors.white.withOpacity(0.9),
+                                          child: Text(
+                                            (user?.username ??
+                                                    user?.displayName ??
+                                                    'U')[0]
+                                                .toUpperCase(),
+                                            style: TextStyle(
+                                              color: AppColors.secondaryColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'Ready to crush your fitness goals today?',
+                                      style: TextStyle(color: Colors.white70),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                           const SizedBox(height: 24),
-
-                          // Quick Actions
                           Text(
                             'Quick Actions',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 16),
-                          GridView.count(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 16,
-                            crossAxisSpacing: 16,
+                          // Modified Quick Actions - 2 cards in a row
+                          Row(
                             children: [
-                              _QuickActionCard(
-                                icon: Icons.fitness_center,
-                                title: 'Start Workout',
-                                color: AppColors.primaryColor,
-                                onTap: () {
-                                  // Navigate to workout screen
-                                },
+                              Expanded(
+                                child: Container(
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        AppColors.primaryColor.withOpacity(0.8),
+                                        AppColors.primaryDark.withOpacity(0.6),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: _QuickActionCard(
+                                    icon: Icons.fitness_center,
+                                    title: 'Start a Workout',
+                                    color: Colors.white,
+                                    onTap: () {
+                                      // Navigate to workout screen
+                                    },
+                                  ),
+                                ),
                               ),
-                              _QuickActionCard(
-                                icon: Icons.track_changes,
-                                title: 'Track Progress',
-                                color: AppColors.secondaryColor,
-                                onTap: () {
-                                  // Navigate to progress screen
-                                },
-                              ),
-                              _QuickActionCard(
-                                icon: Icons.calendar_today,
-                                title: 'Schedule',
-                                color: Colors.green,
-                                onTap: () {
-                                  // Navigate to schedule screen
-                                },
-                              ),
-                              _QuickActionCard(
-                                icon: Icons.person,
-                                title: 'Profile',
-                                color: Colors.purple,
-                                onTap: () {
-                                  // Navigate to profile screen
-                                },
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Container(
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        AppColors.secondaryColor
+                                            .withOpacity(0.8),
+                                        AppColors.secondaryDark
+                                            .withOpacity(0.6),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: _QuickActionCard(
+                                    icon: Icons.track_changes,
+                                    title: 'Track Progress',
+                                    color: Colors.white,
+                                    onTap: () {
+                                      // Navigate to progress screen
+                                    },
+                                  ),
+                                ),
                               ),
                             ],
                           ),
