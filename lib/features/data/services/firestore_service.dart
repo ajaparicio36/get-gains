@@ -12,6 +12,14 @@ class FirestoreService {
     await FirebaseFirestore.instance.waitForPendingWrites();
   }
 
+  Future<UserModel?> getUserData() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return null;
+
+    final doc = await _firestore.collection('users').doc(uid).get();
+    return doc.exists ? UserModel.fromMap(doc.data()!) : null;
+  }
+
   // Create or update user data
   Future<void> setupUserData(User firebaseUser) async {
     final userDoc =
