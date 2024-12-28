@@ -1,8 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../app/constants/colors.dart';
 import 'email_verification_screen.dart';
+import '../../data/services/firestore_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -53,6 +56,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
       );
 
+      // Setup initial user data in Firestore
+      await FirestoreService().setupUserData(userCredential.user!);
+
       // Send email verification
       await userCredential.user?.sendEmailVerification();
 
@@ -81,13 +87,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Google Sign Up
   Future<void> _signUpWithGoogle() async {
-    if (!_acceptedTerms) {
-      setState(() {
-        _errorMessage = 'Please accept the Terms and Privacy Policy';
-      });
-      return;
-    }
-
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -107,7 +106,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         idToken: googleAuth.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      // Sign in with Google
+      final userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Setup initial user data in Firestore
+      // This will automatically create a username from Google display name
+      await FirestoreService().setupUserData(userCredential.user!);
+
+      // No need to navigate anywhere - AuthWrapper will handle the flow
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to sign up with Google';
@@ -352,18 +359,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 24),
 
                   // Register Button
-                  ElevatedButton(
-                    onPressed:
-                        _isLoading ? null : _registerWithEmailAndPassword,
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primaryColor,
+                          AppColors.primaryDark,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              _registerWithEmailAndPassword().then((_) {
+                                if (mounted) {
+                                  Navigator.pop(context);
+                                }
+                              });
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text(
+                              'Create Account',
+                              style: TextStyle(color: Colors.white),
                             ),
-                          )
-                        : const Text('Create Account'),
+                    ),
                   ),
                   const SizedBox(height: 16),
 
@@ -382,7 +419,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   // Google Sign Up Button
                   OutlinedButton.icon(
-                    onPressed: _isLoading ? null : _signUpWithGoogle,
+                    onPressed: _isLoading
+                        ? null
+                        : () {
+                            _signUpWithGoogle().then((_) {
+                              if (mounted) {
+                                Navigator.pop(context);
+                              }
+                            });
+                          },
                     icon: Image.asset(
                       'assets/logos/google_logo.png',
                       height: 24,
