@@ -7,10 +7,17 @@ class AppTheme {
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
       primary: AppColors.primaryColor,
+      primaryContainer: AppColors.primaryDark,
       secondary: AppColors.secondaryColor,
+      secondaryContainer: AppColors.secondaryDark,
       surface: AppColors.surfaceColor,
       background: AppColors.backgroundColor,
       error: AppColors.errorColor,
+      onPrimary: Colors.white,
+      onSecondary: Colors.black,
+      onSurface: Colors.white,
+      onBackground: Colors.white,
+      onError: Colors.white,
     ),
 
     // Button Themes
@@ -18,6 +25,7 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        elevation: 2,
       ),
     ),
 
@@ -41,10 +49,16 @@ class AppTheme {
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: AppColors.errorColor),
       ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: AppColors.errorColor),
+      ),
+      labelStyle: TextStyle(color: Colors.white.withOpacity(0.87)),
+      hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
     ),
 
     // Text Themes
-    textTheme: TextTheme(
+    textTheme: const TextTheme(
       headlineLarge: TextStyle(
         color: Colors.white,
         fontSize: 32,
@@ -60,9 +74,12 @@ class AppTheme {
         fontSize: 16,
       ),
       bodyMedium: TextStyle(
-        color: Colors.white.withOpacity(0.87),
+        color: Colors.white,
         fontSize: 14,
       ),
+    ).apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
     ),
   );
 }
