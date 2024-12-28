@@ -7,9 +7,9 @@ class AppTheme {
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
       primary: AppColors.primaryColor,
-      primaryContainer: AppColors.primaryDark,
+      primaryContainer: AppColors.primaryLight,
       secondary: AppColors.secondaryColor,
-      secondaryContainer: AppColors.secondaryDark,
+      secondaryContainer: AppColors.secondaryLight,
       surface: AppColors.surfaceColor,
       background: AppColors.backgroundColor,
       error: AppColors.errorColor,

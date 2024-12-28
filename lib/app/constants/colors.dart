@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary Colors - Blues
-  static const primaryColor = Color(0xFF1E88E5); // Blue 600
-  static const primaryLight = Color(0xFF42A5F5); // Blue 400
-  static const primaryDark = Color(0xFF1565C0); // Blue 800
+  static const primaryColor = Color(0xFF024CAA); // Main Blue
+  static const primaryLight = Color(0xFF0B5FD4); // Light Blue
+  static const primaryDark = Color(0xFF091057); // Dark Blue
 
-  // Secondary Colors - Warm Orange/Amber
-  static const secondaryColor = Color(0xFFFFA726); // Orange 400
-  static const secondaryLight = Color(0xFFFFB74D); // Orange 300
-  static const secondaryDark = Color(0xFFF57C00); // Orange 700
+  // Secondary Colors - Orange
+  static const secondaryColor = Color(0xFFEC8305); // Main Orange
+  static const secondaryLight = Color(0xFFFF9B2A); // Light Orange
+  static const secondaryDark = Color(0xFFD67100); // Dark Orange
+
+  // Tertiary Colors
+  static const tertiaryColor = Color(0xFFDBD3D3); // Greyish White
 
   // Other Colors
   static const backgroundColor = Color(0xFF121212); // Very Dark Grey
