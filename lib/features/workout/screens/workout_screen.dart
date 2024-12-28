@@ -27,21 +27,28 @@ class WorkoutsScreen extends StatelessWidget {
         children: [
           // In Progress Workouts Section
           Expanded(
-            flex: 2,
-            child: _buildWorkoutSection(
-              title: 'In Progress',
-              stream: _getInProgressWorkouts(),
-              onLongPress: _handleInProgressWorkoutLongPress,
+            flex: 1, // Smaller flex for in-progress
+            child: Card(
+              elevation: 0,
+              color: Colors.transparent,
+              child: _buildWorkoutSection(
+                title: 'In Progress',
+                stream: _getInProgressWorkouts(),
+                onLongPress: _handleInProgressWorkoutLongPress,
+              ),
             ),
           ),
-          const Divider(height: 1),
           // Previous Workouts Section
           Expanded(
-            flex: 3,
-            child: _buildWorkoutSection(
-              title: 'Previous Workouts',
-              stream: _getPreviousWorkouts(),
-              onLongPress: _handlePreviousWorkoutLongPress,
+            flex: 2, // Larger flex for previous workouts
+            child: Card(
+              elevation: 0,
+              color: Colors.transparent,
+              child: _buildWorkoutSection(
+                title: 'Previous Workouts',
+                stream: _getPreviousWorkouts(),
+                onLongPress: _handlePreviousWorkoutLongPress,
+              ),
             ),
           ),
         ],
@@ -110,6 +117,7 @@ class WorkoutsScreen extends StatelessWidget {
   ) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      color: Theme.of(context).colorScheme.primary.withOpacity(1),
       child: ListTile(
         title: Text(workout.name),
         subtitle: Text(
