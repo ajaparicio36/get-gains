@@ -1,12 +1,14 @@
+import 'personal_best_model.dart';
+
 class ExerciseModel {
+  static const int maxPersonalBestRecords = 5;
+
   final String id;
   final String name;
   final String? description;
   final String? category;
-  final List<String> musclesWorked; // Added field
-  final List<String> muscleGroups;
-  final double? personalBestWeight;
-  final int? personalBestReps;
+  final List<String> musclesWorked;
+  final List<PersonalBestRecord> personalBestRecords;
   final DateTime? lastPerformed;
   final String? notes;
 
@@ -15,13 +17,21 @@ class ExerciseModel {
     required this.name,
     this.description,
     this.category,
-    this.musclesWorked = const [], // Initialize empty list
-    this.muscleGroups = const [],
-    this.personalBestWeight,
-    this.personalBestReps,
+    this.musclesWorked = const [],
+    this.personalBestRecords = const [],
     this.lastPerformed,
     this.notes,
   });
+
+  // Getters for the most recent personal best
+  PersonalBestRecord? get latestPersonalBest {
+    if (personalBestRecords.isEmpty) return null;
+    return personalBestRecords.reduce(
+        (curr, next) => curr.achievedAt.isAfter(next.achievedAt) ? curr : next);
+  }
+
+  double? get personalBestWeight => latestPersonalBest?.weight;
+  int? get personalBestReps => latestPersonalBest?.reps;
 
   Map<String, dynamic> toMap() {
     return {
@@ -30,9 +40,8 @@ class ExerciseModel {
       'description': description,
       'category': category,
       'musclesWorked': musclesWorked,
-      'muscleGroups': muscleGroups,
-      'personalBestWeight': personalBestWeight,
-      'personalBestReps': personalBestReps,
+      'personalBestRecords':
+          personalBestRecords.map((record) => record.toMap()).toList(),
       'lastPerformed': lastPerformed?.toIso8601String(),
       'notes': notes,
     };
@@ -45,9 +54,10 @@ class ExerciseModel {
       description: map['description'],
       category: map['category'],
       musclesWorked: List<String>.from(map['musclesWorked'] ?? []),
-      muscleGroups: List<String>.from(map['muscleGroups'] ?? []),
-      personalBestWeight: map['personalBestWeight']?.toDouble(),
-      personalBestReps: map['personalBestReps']?.toInt(),
+      personalBestRecords: (map['personalBestRecords'] as List?)
+              ?.map((record) => PersonalBestRecord.fromMap(record))
+              .toList() ??
+          [],
       lastPerformed: map['lastPerformed'] != null
           ? DateTime.parse(map['lastPerformed'])
           : null,
@@ -61,9 +71,7 @@ class ExerciseModel {
     String? description,
     String? category,
     List<String>? musclesWorked,
-    List<String>? muscleGroups,
-    double? personalBestWeight,
-    int? personalBestReps,
+    List<PersonalBestRecord>? personalBestRecords,
     DateTime? lastPerformed,
     String? notes,
   }) {
@@ -73,9 +81,7 @@ class ExerciseModel {
       description: description ?? this.description,
       category: category ?? this.category,
       musclesWorked: musclesWorked ?? this.musclesWorked,
-      muscleGroups: muscleGroups ?? this.muscleGroups,
-      personalBestWeight: personalBestWeight ?? this.personalBestWeight,
-      personalBestReps: personalBestReps ?? this.personalBestReps,
+      personalBestRecords: personalBestRecords ?? this.personalBestRecords,
       lastPerformed: lastPerformed ?? this.lastPerformed,
       notes: notes ?? this.notes,
     );
