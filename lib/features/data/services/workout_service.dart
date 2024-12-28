@@ -3,6 +3,7 @@ import '../models/workout_model.dart';
 import '../models/workout_exercise_model.dart';
 import '../models/exercise_set_model.dart';
 import '../models/exercise_model.dart';
+import '../models/personal_best_model.dart';
 
 class WorkoutService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -197,17 +198,49 @@ class WorkoutService {
     final exerciseDoc = await exerciseRef.get();
     final exercise = ExerciseModel.fromMap(exerciseDoc.data()!);
 
-    // Update if new personal bests achieved
-    if (newSet.weight > (exercise.personalBestWeight ?? 0)) {
-      await exerciseRef.update({
-        'personalBestWeight': newSet.weight,
-        'lastPerformed': DateTime.now().toIso8601String(),
-      });
+    // Get current personal bests
+    final currentBestWeight = exercise.personalBestWeight ?? 0;
+    final currentBestReps = exercise.personalBestReps ?? 0;
+
+    // Check if this set achieved a new personal best
+    bool isNewPersonalBest = false;
+
+    if (newSet.weight > currentBestWeight || newSet.reps > currentBestReps) {
+      isNewPersonalBest = true;
     }
 
-    if (newSet.reps > (exercise.personalBestReps ?? 0)) {
+    if (isNewPersonalBest) {
+      // Create new personal best record
+      final newRecord = PersonalBestRecord(
+        weight: newSet.weight,
+        reps: newSet.reps,
+        achievedAt: DateTime.now(),
+      );
+
+      // Get current records and add new one
+      List<PersonalBestRecord> updatedRecords = [
+        ...exercise.personalBestRecords,
+        newRecord,
+      ];
+
+      // Sort by date, most recent first
+      updatedRecords.sort((a, b) => b.achievedAt.compareTo(a.achievedAt));
+
+      // Keep only the most recent 5 records
+      if (updatedRecords.length > ExerciseModel.maxPersonalBestRecords) {
+        updatedRecords =
+            updatedRecords.take(ExerciseModel.maxPersonalBestRecords).toList();
+      }
+
+      // Update exercise document
       await exerciseRef.update({
-        'personalBestReps': newSet.reps,
+        'personalBestRecords':
+            updatedRecords.map((record) => record.toMap()).toList(),
+        'lastPerformed': DateTime.now().toIso8601String(),
+      });
+    } else {
+      // Just update the last performed date
+      await exerciseRef.update({
         'lastPerformed': DateTime.now().toIso8601String(),
       });
     }
