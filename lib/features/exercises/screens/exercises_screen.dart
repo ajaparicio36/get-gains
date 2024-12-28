@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/models/exercise_model.dart';
 import '../widgets/create_exercise.dart';
+import 'exercise_details.dart';
 
 class ExercisesScreen extends StatelessWidget {
   ExercisesScreen({super.key});
@@ -70,58 +71,71 @@ class ExercisesScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final exercise = exercises[index];
               return Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary,
-                        Theme.of(context).colorScheme.primaryContainer,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
                   ),
-                  child: ListTile(
-                    title: Text(
-                      exercise.name,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          exercise.category ?? 'Uncategorized',
-                          style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimary
-                                  .withOpacity(0.7)),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ExerciseDetailsScreen(exercise: exercise),
                         ),
-                        if (exercise.personalBestWeight != null ||
-                            exercise.personalBestReps != null)
-                          Text(
-                            'PB: ${exercise.personalBestWeight?.toStringAsFixed(1)}kg × ${exercise.personalBestReps} reps',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontWeight: FontWeight.bold,
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context).colorScheme.primary,
+                            Theme.of(context).colorScheme.primaryContainer,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: ListTile(
+                        title: Text(
+                          exercise.name,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              exercise.category ?? 'Uncategorized',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimary
+                                      .withOpacity(0.7)),
                             ),
-                          ),
-                      ],
+                            if (exercise.personalBestWeight != null ||
+                                exercise.personalBestReps != null)
+                              Text(
+                                'PB: ${exercise.personalBestWeight?.toStringAsFixed(1)}kg × ${exercise.personalBestReps} reps',
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(Icons.more_vert,
+                              color: Theme.of(context).colorScheme.onPrimary),
+                          onPressed: () =>
+                              _showExerciseOptions(context, exercise),
+                        ),
+                      ),
                     ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.more_vert,
-                          color: Theme.of(context).colorScheme.onPrimary),
-                      onPressed: () => _showExerciseOptions(context, exercise),
-                    ),
-                  ),
-                ),
-              );
+                  ));
             },
           );
         },
