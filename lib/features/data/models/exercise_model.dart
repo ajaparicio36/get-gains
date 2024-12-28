@@ -3,6 +3,7 @@ class ExerciseModel {
   final String name;
   final String? description;
   final String? category;
+  final List<String> musclesWorked; // Added field
   final List<String> muscleGroups;
   final double? personalBestWeight;
   final int? personalBestReps;
@@ -14,6 +15,7 @@ class ExerciseModel {
     required this.name,
     this.description,
     this.category,
+    this.musclesWorked = const [], // Initialize empty list
     this.muscleGroups = const [],
     this.personalBestWeight,
     this.personalBestReps,
@@ -27,6 +29,7 @@ class ExerciseModel {
       'name': name,
       'description': description,
       'category': category,
+      'musclesWorked': musclesWorked,
       'muscleGroups': muscleGroups,
       'personalBestWeight': personalBestWeight,
       'personalBestReps': personalBestReps,
@@ -41,6 +44,7 @@ class ExerciseModel {
       name: map['name'] ?? '',
       description: map['description'],
       category: map['category'],
+      musclesWorked: List<String>.from(map['musclesWorked'] ?? []),
       muscleGroups: List<String>.from(map['muscleGroups'] ?? []),
       personalBestWeight: map['personalBestWeight']?.toDouble(),
       personalBestReps: map['personalBestReps']?.toInt(),
@@ -56,6 +60,7 @@ class ExerciseModel {
     String? name,
     String? description,
     String? category,
+    List<String>? musclesWorked,
     List<String>? muscleGroups,
     double? personalBestWeight,
     int? personalBestReps,
@@ -67,6 +72,7 @@ class ExerciseModel {
       name: name ?? this.name,
       description: description ?? this.description,
       category: category ?? this.category,
+      musclesWorked: musclesWorked ?? this.musclesWorked,
       muscleGroups: muscleGroups ?? this.muscleGroups,
       personalBestWeight: personalBestWeight ?? this.personalBestWeight,
       personalBestReps: personalBestReps ?? this.personalBestReps,
