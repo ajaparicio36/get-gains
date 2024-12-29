@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/models/workout_model.dart';
-import '../../data/models/exercise_model.dart';
-import '../../data/services/workout_service.dart';
 import '../widgets/exercise_card.dart';
 import '../widgets/add_exercise_screen.dart';
 
@@ -20,7 +18,6 @@ class WorkoutDetailScreen extends StatefulWidget {
 }
 
 class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
-  final WorkoutService _workoutService = WorkoutService();
   final String userId = FirebaseAuth.instance.currentUser!.uid;
 
   void _showAddExerciseScreen(BuildContext context) {
@@ -37,12 +34,6 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.workout.name),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => _showAddExerciseScreen(context),
-          ),
-        ],
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
@@ -87,7 +78,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton(
-                    onPressed: () => _showAddExerciseDialog(context),
+                    onPressed: () => _showAddExerciseScreen(context),
                     child: const Text('Add Exercise'),
                   ),
                 ],
@@ -142,51 +133,5 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
     await workoutRef.update({
       'exercises': updatedExercises.map((e) => e.toMap()).toList(),
     });
-  }
-
-  Future<void> _showAddExerciseDialog(BuildContext context) async {
-    final exercises = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('exercises')
-        .get();
-
-    if (!context.mounted) return;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Exercise'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: exercises.docs.length,
-            itemBuilder: (context, index) {
-              final exercise =
-                  ExerciseModel.fromMap(exercises.docs[index].data());
-              return ListTile(
-                title: Text(exercise.name),
-                subtitle: Text(exercise.category ?? 'Uncategorized'),
-                onTap: () async {
-                  await _workoutService.addExerciseToWorkout(
-                    userId,
-                    widget.workout.id,
-                    exercise.id,
-                  );
-                  if (context.mounted) Navigator.pop(context);
-                },
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-    );
   }
 }

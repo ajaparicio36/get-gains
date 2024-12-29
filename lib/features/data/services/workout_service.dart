@@ -24,6 +24,41 @@ class WorkoutService {
     return workoutRef.id;
   }
 
+  Future<String> copyWorkout(String userId, String workoutId) async {
+    // Get the original workout
+    final originalWorkoutDoc = await _db
+        .collection('users')
+        .doc(userId)
+        .collection('workouts')
+        .doc(workoutId)
+        .get();
+
+    final originalWorkout = WorkoutModel.fromMap(originalWorkoutDoc.data()!);
+
+    // Create a new workout document reference
+    final newWorkoutRef =
+        _db.collection('users').doc(userId).collection('workouts').doc();
+
+    // Create new workout with same name but current date and empty sets
+    final newWorkout = WorkoutModel(
+      id: newWorkoutRef.id,
+      name:
+          "${originalWorkout.name} (Copy)", // Optional: add (Copy) to differentiate
+      date: DateTime.now(),
+      exercises: originalWorkout.exercises
+          .map((exercise) => WorkoutExercise(
+                exerciseId: exercise.exerciseId,
+                sets: [], // Initialize with empty sets
+              ))
+          .toList(),
+    );
+
+    // Save the new workout
+    await newWorkoutRef.set(newWorkout.toMap());
+
+    return newWorkoutRef.id;
+  }
+
   Future<void> updateWorkoutName(
     String userId,
     String workoutId,

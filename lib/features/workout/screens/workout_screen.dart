@@ -11,6 +11,93 @@ class WorkoutsScreen extends StatelessWidget {
   final WorkoutService _workoutService = WorkoutService();
   final String userId = FirebaseAuth.instance.currentUser!.uid;
 
+  Future<void> _showEditNameDialog(
+      BuildContext context, WorkoutModel workout) async {
+    final nameController = TextEditingController(text: workout.name);
+
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Workout Name'),
+        content: TextField(
+          controller: nameController,
+          decoration: const InputDecoration(
+            labelText: 'Workout Name',
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text('Save'),
+            onPressed: () async {
+              if (nameController.text.isNotEmpty) {
+                try {
+                  await _workoutService.updateWorkoutName(
+                    userId,
+                    workout.id,
+                    nameController.text.trim(),
+                  );
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Workout name updated successfully'),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Error updating workout name: ${e.toString()}'),
+                      ),
+                    );
+                  }
+                }
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _reperformWorkout(
+      BuildContext context, WorkoutModel workout) async {
+    try {
+      final newWorkoutId =
+          await _workoutService.copyWorkout(userId, workout.id);
+
+      // Navigate to the new workout
+      if (context.mounted) {
+        // Get the new workout details
+        final workoutDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .collection('workouts')
+            .doc(newWorkoutId)
+            .get();
+
+        final newWorkout = WorkoutModel.fromMap(workoutDoc.data()!);
+        await _showEditNameDialog(context, newWorkout);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error creating workout: ${e.toString()}'),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +112,27 @@ class WorkoutsScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
+          Card(
+            elevation: 0,
+            color: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.info_outline, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Long press to view options',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           // In Progress Workouts Section
           Expanded(
             flex: 1, // Smaller flex for in-progress
@@ -166,6 +274,14 @@ class WorkoutsScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: const Text('Edit Name'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _showEditNameDialog(context, workout);
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.check_circle_outline),
               title: const Text('Mark as Complete'),
               onTap: () async {
@@ -197,6 +313,22 @@ class WorkoutsScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: const Text('Edit Name'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _showEditNameDialog(context, workout);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.replay),
+              title: const Text('Reperform Workout'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _reperformWorkout(context, workout);
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.share_outlined),
               title: const Text('Share Workout'),
