@@ -1,14 +1,18 @@
+// exercises screen
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/models/exercise_model.dart';
 import '../widgets/create_exercise.dart';
 import 'exercise_details.dart';
+import '../../data/services/workout_service.dart';
+import 'exercise_search_screen.dart';
 
 class ExercisesScreen extends StatelessWidget {
   ExercisesScreen({super.key});
 
   final String userId = FirebaseAuth.instance.currentUser!.uid;
+  final WorkoutService workoutService = WorkoutService();
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +22,7 @@ class ExercisesScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => _showCreateExerciseDialog(context),
+            onPressed: () => _showExerciseOptionsDialog(context),
           ),
         ],
       ),
@@ -57,8 +61,8 @@ class ExercisesScreen extends StatelessWidget {
                   const Text('No exercises yet'),
                   const SizedBox(height: 8),
                   ElevatedButton(
-                    onPressed: () => _showCreateExerciseDialog(context),
-                    child: const Text('Create Exercise'),
+                    onPressed: () => _showExerciseOptionsDialog(context),
+                    child: const Text('Add Exercise'),
                   ),
                 ],
               ),
@@ -143,11 +147,44 @@ class ExercisesScreen extends StatelessWidget {
     );
   }
 
-  void _showCreateExerciseDialog(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const CreateExerciseScreen(),
+  void _showExerciseOptionsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Exercise'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.search),
+              title: const Text('Browse ExerciseDB'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ExerciseSearchScreen(
+                      userId: userId,
+                      workoutService: workoutService,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.add),
+              title: const Text('Create Custom Exercise'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CreateExerciseScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

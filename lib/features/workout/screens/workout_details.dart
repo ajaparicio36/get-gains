@@ -1,9 +1,12 @@
+// workout details
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/models/workout_model.dart';
 import '../widgets/exercise_card.dart';
 import '../widgets/add_exercise_screen.dart';
+import '../../data/services/workout_service.dart';
+import '../../exercises/screens/exercise_search_screen.dart';
 
 class WorkoutDetailScreen extends StatefulWidget {
   final WorkoutModel workout;
@@ -19,6 +22,45 @@ class WorkoutDetailScreen extends StatefulWidget {
 
 class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
+  final WorkoutService workoutService = WorkoutService();
+
+  void _showAddExerciseOptions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Exercise'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.search),
+              title: const Text('Browse ExerciseDB'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ExerciseSearchScreen(
+                      userId: userId,
+                      workoutId: widget.workout.id,
+                      workoutService: workoutService,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.fitness_center),
+              title: const Text('Choose from My Exercises'),
+              onTap: () {
+                Navigator.pop(context);
+                _showAddExerciseScreen(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _showAddExerciseScreen(BuildContext context) {
     showModalBottomSheet(
@@ -78,7 +120,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton(
-                    onPressed: () => _showAddExerciseScreen(context),
+                    onPressed: () => _showAddExerciseOptions(context),
                     child: const Text('Add Exercise'),
                   ),
                 ],
@@ -106,7 +148,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddExerciseScreen(context),
+        onPressed: () => _showAddExerciseOptions(context),
         child: const Icon(Icons.add),
       ),
     );
