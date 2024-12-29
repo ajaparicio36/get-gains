@@ -5,6 +5,7 @@ import '../../features/data/models/user_model.dart';
 import '../constants/colors.dart';
 import '../../features/workout/screens/workout_screen.dart';
 import '../../features/exercises/screens/exercises_screen.dart';
+import '../../features/progress/screens/progress_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -269,7 +270,12 @@ class HomeScreen extends StatelessWidget {
                                 title: 'Track Progress',
                                 color: Colors.white,
                                 onTap: () {
-                                  // Navigate to progress screen
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProgressScreen(),
+                                    ),
+                                  );
                                 },
                               ),
                             ),

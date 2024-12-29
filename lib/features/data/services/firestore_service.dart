@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
+import '../models/exercise_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String? get currentUserId => _auth.currentUser?.uid;
 
   // Initialize Firestore with offline persistence
   Future<void> initializeFirestore() async {
@@ -120,5 +123,19 @@ class FirestoreService {
     await _firestore.collection('users').doc(uid).update({
       'preferences': preferences,
     });
+  }
+
+  Stream<List<ExerciseModel>> getExercisesStream() {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return Stream.value([]);
+
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('exercises')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => ExerciseModel.fromMap(doc.data()))
+            .toList());
   }
 }

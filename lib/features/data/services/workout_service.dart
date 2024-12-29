@@ -152,6 +152,19 @@ class WorkoutService {
     await updatePersonalBests(userId, exerciseId, newSet);
   }
 
+  Stream<List<WorkoutModel>> getRecentWorkoutsStream(String userId) {
+    return _db
+        .collection('users')
+        .doc(userId)
+        .collection('workouts')
+        .orderBy('date', descending: true)
+        .limit(30) // Last 30 workouts should be enough for progress tracking
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => WorkoutModel.fromMap(doc.data()))
+            .toList());
+  }
+
   Future<void> editSet(
     String userId,
     String workoutId,
