@@ -6,6 +6,7 @@ import '../constants/colors.dart';
 import '../../features/workout/screens/workout_screen.dart';
 import '../../features/exercises/screens/exercises_screen.dart';
 import '../../features/progress/screens/progress_screen.dart';
+import 'loading_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -67,19 +68,39 @@ class HomeScreen extends StatelessWidget {
                         child: ListView(
                           children: [
                             ListTile(
+                              leading: const Icon(Icons.home),
+                              title: const Text('Home'),
+                              onTap: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) => const HomeScreen()),
+                                  (Route<dynamic> route) =>
+                                      false, // This removes all previous routes
+                                );
+                              },
+                            ),
+                            ListTile(
                               leading: const Icon(Icons.fitness_center),
                               title: const Text('Workouts'),
                               onTap: () {
-                                // Navigate to workouts
-                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => WorkoutsScreen(),
+                                  ),
+                                );
                               },
                             ),
                             ListTile(
                               leading: const Icon(Icons.sports_gymnastics),
                               title: const Text('Exercises'),
                               onTap: () {
-                                // Navigate to exercises
-                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ExercisesScreen(),
+                                  ),
+                                );
                               },
                             ),
                             ListTile(
@@ -122,7 +143,7 @@ class HomeScreen extends StatelessWidget {
         stream: firestoreService.getUserStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const LoadingScreen();
           }
 
           final user = snapshot.data;
