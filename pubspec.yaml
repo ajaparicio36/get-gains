@@ -42,6 +42,7 @@ dependencies:
   google_sign_in: ^6.2.2
   intl: ^0.20.1
   fl_chart: ^0.70.0
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +68,8 @@ flutter:
   assets:
       - assets/logos/google_logo.png
       - assets/logos/get_gains.png
+      - assets/logos/get_gains_with_title.png
+      - assets/logos/branding.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
