@@ -38,14 +38,15 @@ class _ExerciseSearchScreenState extends State<ExerciseSearchScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            'https://exercisedb-api.vercel.app/api/v1/exercises/autocomplete?search=$query'),
+            'https://exercisedb-api.vercel.app/api/v1/exercises?search=$query&limit=10'),
         headers: {
           'Content-Type': 'application/json',
         },
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> results = json.decode(response.body);
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> results = responseData['data']['exercises'];
         setState(() {
           _suggestions = results
               .map((item) => {

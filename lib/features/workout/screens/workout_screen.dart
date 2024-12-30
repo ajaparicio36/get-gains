@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/models/workout_model.dart';
 import '../../data/services/workout_service.dart';
 import 'workout_details.dart';
+import '../../catalogue/widgets/share_dialog.dart';
+import '../../data/services/shared_workout_service.dart';
 
 class WorkoutsScreen extends StatelessWidget {
   WorkoutsScreen({super.key});
@@ -335,11 +337,7 @@ class WorkoutsScreen extends StatelessWidget {
               title: const Text('Share Workout'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Share feature coming soon!'),
-                  ),
-                );
+                showShareWorkoutDialog(context, workout.id, workout.name);
               },
             ),
             ListTile(
@@ -353,6 +351,35 @@ class WorkoutsScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void showShareWorkoutDialog(
+      BuildContext context, String workoutId, String workoutName) {
+    showDialog(
+      context: context,
+      builder: (context) => ShareWorkoutDialog(
+        workoutId: workoutId,
+        workoutName: workoutName,
+        onShare: (workoutId, description, tags) async {
+          try {
+            await SharedWorkoutService().shareWorkout(
+              workoutId: workoutId,
+              description: description,
+              tags: tags,
+            );
+            // Show success message
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Workout shared successfully!')),
+            );
+          } catch (e) {
+            // Show error message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error sharing workout: ${e.toString()}')),
+            );
+          }
+        },
       ),
     );
   }

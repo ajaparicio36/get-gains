@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/workout_model.dart';
 import '../models/exercise_model.dart';
 import '../models/shared_workout_model.dart';
+import '../models/workout_exercise_model.dart';
 
 class SharedWorkoutService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -95,23 +96,30 @@ class SharedWorkoutService {
     // Start a batch write
     final batch = _db.batch();
 
+    // Map to store new exercise IDs
+    Map<String, String> exerciseIdMap = {};
+
     // 1. Copy exercises to user's exercise collection
     for (var exercise in sharedWorkout.exercises) {
       final exerciseRef =
           _db.collection('users').doc(userId).collection('exercises').doc();
 
-      // Create new exercise document
       final newExercise = ExerciseModel(
         id: exerciseRef.id,
-        name:
-            'Exercise ${exercise.exerciseId}', // You'll need to fetch the original exercise name
-        musclesWorked: [], // You might want to fetch these from the original exercise
+        name: exercise.name,
+        description: exercise.description,
+        category: exercise.category,
+        musclesWorked: exercise.musclesWorked,
+        // Initialize empty personal bests and timestamps
+        personalBestRecords: [],
+        lastPerformed: null,
       );
 
       batch.set(exerciseRef, newExercise.toMap());
+      exerciseIdMap[exercise.id] = exerciseRef.id;
     }
 
-    // 2. Create new workout in user's collection
+    // 2. Create new workout in user's collection with workout exercises
     final newWorkoutRef =
         _db.collection('users').doc(userId).collection('workouts').doc();
 
@@ -119,7 +127,12 @@ class SharedWorkoutService {
       id: newWorkoutRef.id,
       name: sharedWorkout.name,
       date: DateTime.now(),
-      exercises: sharedWorkout.exercises,
+      exercises: sharedWorkout.exercises
+          .map((exercise) => WorkoutExercise(
+                exerciseId: exerciseIdMap[exercise.id] ?? '',
+                sets: [], // Start with empty sets
+              ))
+          .toList(),
     );
 
     batch.set(newWorkoutRef, newWorkout.toMap());
@@ -287,6 +300,24 @@ class SharedWorkoutService {
         userDoc.data()?['username'] ??
         'Anonymous';
 
+    // Fetch all exercise details
+    List<ExerciseModel> exercises = [];
+    for (var workoutExercise in workout.exercises) {
+      final exerciseDoc = await _db
+          .collection('users')
+          .doc(userId)
+          .collection('exercises')
+          .doc(workoutExercise.exerciseId)
+          .get();
+
+      if (exerciseDoc.exists) {
+        exercises.add(ExerciseModel.fromMap({
+          ...exerciseDoc.data()!,
+          'id': exerciseDoc.id,
+        }));
+      }
+    }
+
     // Create search terms from workout name
     final searchTerms = workout.name
         .toLowerCase()
@@ -303,7 +334,16 @@ class SharedWorkoutService {
       ownerId: userId,
       ownerName: ownerName,
       description: description,
-      exercises: workout.exercises.map((e) => e.copyWith(sets: [])).toList(),
+      exercises: exercises
+          .map((exercise) => ExerciseModel(
+                id: exercise.id,
+                name: exercise.name,
+                description: exercise.description,
+                category: exercise.category,
+                musclesWorked: exercise.musclesWorked,
+                // Don't include personal bests or timestamps when sharing
+              ))
+          .toList(),
       createdAt: DateTime.now(),
       tags: tags,
       heartCount: 0,
@@ -315,6 +355,40 @@ class SharedWorkoutService {
       ...sharedWorkout.toMap(),
       'searchTerms': searchTerms,
     });
+  }
+
+  Stream<List<SharedWorkoutModel>> getMySharedWorkoutsStream() {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return Stream.value([]);
+
+    return _db
+        .collection('shared_workouts')
+        .where('ownerId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => SharedWorkoutModel.fromMap(doc.data()))
+            .toList());
+  }
+
+  Future<void> deleteSharedWorkout(String workoutId) async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) throw Exception('User not authenticated');
+
+    final workoutDoc =
+        await _db.collection('shared_workouts').doc(workoutId).get();
+
+    if (!workoutDoc.exists) {
+      throw Exception('Workout not found');
+    }
+
+    final workout = SharedWorkoutModel.fromMap(workoutDoc.data()!);
+
+    if (workout.ownerId != userId) {
+      throw Exception('Unauthorized: You can only delete your own workouts');
+    }
+
+    await _db.collection('shared_workouts').doc(workoutId).delete();
   }
 }
 

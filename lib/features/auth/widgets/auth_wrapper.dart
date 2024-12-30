@@ -8,6 +8,7 @@ import '../../../app/screens/home_screen.dart';
 import '../screens/email_verification_screen.dart';
 import '../screens/login_screen.dart';
 import 'username_setup_dialog.dart';
+import '../../../app/screens/loading_screen.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
@@ -40,8 +41,7 @@ class AuthWrapper extends StatelessWidget {
       child: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
           if (authProvider.isLoading) {
-            return const Scaffold(
-                body: Center(child: CircularProgressIndicator()));
+            return const LoadingScreen();
           }
 
           if (!authProvider.isAuthenticated) {
@@ -52,8 +52,7 @@ class AuthWrapper extends StatelessWidget {
             future: _checkUserStatus(authProvider.user!.uid),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
-                    body: Center(child: CircularProgressIndicator()));
+                return const LoadingScreen();
               }
 
               if (snapshot.data == 'needs_verification') {
