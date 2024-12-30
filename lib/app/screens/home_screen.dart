@@ -6,6 +6,8 @@ import '../constants/colors.dart';
 import '../../features/workout/screens/workout_screen.dart';
 import '../../features/exercises/screens/exercises_screen.dart';
 import '../../features/progress/screens/progress_screen.dart';
+import '../../features/catalogue/screens/workout_catalogue_screen.dart';
+import '../../features/catalogue/screens/my_shared_workouts.dart';
 import 'loading_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -104,11 +106,13 @@ class HomeScreen extends StatelessWidget {
                               },
                             ),
                             ListTile(
-                              leading: const Icon(Icons.share),
-                              title: const Text('Share'),
+                              leading: const Icon(Icons.track_changes),
+                              title: const Text('My Shared Workouts'),
                               onTap: () {
-                                // Handle share
-                                Navigator.pop(context);
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  return MySharedWorkoutsScreen();
+                                }));
                               },
                             ),
                           ],
@@ -358,7 +362,8 @@ class HomeScreen extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ExercisesScreen(),
+                                      builder: (context) =>
+                                          WorkoutCatalogueScreen(),
                                     ),
                                   );
                                 },
